@@ -1,13 +1,10 @@
 # Please run the main code before running this code
 source("election-data-analysis.R")
-
-library(tidyverse)
-library(patchwork)
-library(rddensity)
-library(rdrobust)
-library(fixest)
-library(modelsummary)
-library(showtext)
+# install pacman if not installed
+if (!require("pacman")) install.packages("pacman")
+# load all the required packages
+pacman::p_load(tidyverse, rddensity, rdrobust, 
+               fixest, modelsummry, showtext)
 font_add_google("Fira Sans")
 showtext_auto()
 
