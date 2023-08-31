@@ -9,4 +9,4 @@ There are four files in this folder:
 
 3. All_States_GE.csv (the main dataset)
 
-4. Response.pdf (a short note that reports the findings)
+4. [Response.pdf](https://github.com/sumitrmishra/not-so-harmless-replication/blob/master/Response.pdf) (a short note that reports the findings)
