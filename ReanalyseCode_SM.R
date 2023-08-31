@@ -1,13 +1,16 @@
 # Please run the main code before running this code
 source("election-data-analysis.R")
-# install pacman if not installed
-if (!require("pacman")) install.packages("pacman")
-# load all the required packages
-pacman::p_load(tidyverse, rddensity, rdrobust, 
-               fixest, modelsummry, showtext)
+
+# load all the packages
+library(tidyverse)
+library(patchwork)
+library(rddensity)
+library(rdrobust)
+library(fixest)
+library(modelsummary)
+library(showtext)
 font_add_google("Fira Sans")
 showtext_auto()
-
 
 #______________________________________________________________#
 # chunk that will let you read rdrobust as modelsummary:
@@ -48,9 +51,13 @@ DCdensity(data_fnb$Win_Margin, ext.out = T)
 # standard is to look at half the bandwidth size
 DCdensity(data_fnb$Win_Margin, bw = 0.111, ext.out = T)
 
+# use rddensity for McCrary test
 test_density_nonBJP <- rddensity(data_fnb$Win_Margin, c = 0,
                           massPoints = F)
+# summarise the results
 summary(test_density_nonBJP)
+
+# plot the densities around the cutoff
 plotdensitytest_nonBJP <- rdplotdensity(
   rdd = test_density_nonBJP,
   X = data_fnb$Win_Margin,
@@ -58,7 +65,7 @@ plotdensitytest_nonBJP <- rdplotdensity(
 )
 
 
-# on the other hand, in the BJP states
+# repeat the same procedure for the BJP-ruled states
 test_density_BJP <- rddensity(data_fb$Win_Margin, c = 0,
                                  massPoints = F)
 summary(test_density_BJP)
@@ -76,7 +83,7 @@ data_e_winner <-
   )
 
 
-# Growth of Muslim voters regressed on BJP win margin
+# Growth rate of electorate regressed on BJP win margin
 rdrobust(
   y = data_e$g,
   x = data_e$Win_Margin,
@@ -104,10 +111,10 @@ p01 + labs(x = "BJP victory margin",
 
 
 # Since everything so far has been done using automated procedure, 
-# people may
-# think that our results are driven by bandwidth choice.
-# let's do this using different bandwidths
+# people may think that these results are driven by bandwidth choice.
+# use different bandwidths
 
+# `rdbwselect()` will let you know all possible bandwidths
 rdbwselect(
   y = data_e$g,
   x = data_e$Win_Margin,
@@ -115,6 +122,10 @@ rdbwselect(
   all = TRUE
 ) |>
   summary()
+
+# we select three bandwidths that have lowest bias around
+# the cutoff
+
 
 # MSE RD bandwidth
 m1 <- rdrobust(
@@ -147,6 +158,8 @@ msummary(m_diffbw,
              stars = T)
 
 # adjust kernel
+
+# triangular
 m4 <-
   rdrobust(
   y = data_e$g,
@@ -155,6 +168,7 @@ m4 <-
   kernel = "triangular"
 )
 
+# epanechnikov
 m5 <- 
   rdrobust(
   y = data_e$g,
@@ -163,6 +177,7 @@ m5 <-
   kernel = "epanechnikov"
 )
 
+#uniform
 m6 <- 
   rdrobust(
   y = data_e$g,
@@ -171,12 +186,14 @@ m6 <-
   kernel = "uniform"
 ) 
 
+# put together these results
 m_diffkr <- list(
   "Kernel: Triangular" = m4,
   "Kernel: Epanechnikov" = m5,
   "Kernel: Uniform" = m6
 )
 
+# print the output
 msummary(
   m_diffkr,
   stars = T
