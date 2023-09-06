@@ -104,7 +104,6 @@ p01 + labs(x = "BJP victory margin",
            y = "Growth rate of Muslim voters",
            title = "") +
   theme(
-    # Special Elite for both axis title and plot title
     axis.title = element_text(family = "Fira Sans"),
     title = element_text(family = "Fira Sans")
   )
